@@ -92,7 +92,6 @@ func (r *QueueRepository) SaveTicket(ctx context.Context, ticket *domain.QueueTi
 		ON (Target.TicketNumber = Source.TicketNumber)
 		WHEN MATCHED THEN
 			UPDATE SET 
-				CreatedAt = @CreatedAt,
 				IssuedAt = @IssuedAt,
 				Status = @Status
 		WHEN NOT MATCHED THEN
@@ -137,7 +136,13 @@ func (r *QueueRepository) GetCurrentQueue(ctx context.Context) (*domain.QueueCou
 
 // ClearQueue resets the queue to A0
 func (r *QueueRepository) ClearQueue(ctx context.Context) error {
-	_, err := r.db.ExecContext(
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return fmt.Errorf("failed to begin clear transction: %w", err)
+	}
+	defer tx.Rollback()
+
+	_, err = tx.ExecContext(
 		ctx,
 		`UPDATE QueueCounter 
 		 SET CurrentNumber = '00', 
@@ -145,9 +150,22 @@ func (r *QueueRepository) ClearQueue(ctx context.Context) error {
 		     LastUpdatedAt = GETUTCDATE()
 		 WHERE ID = 1`,
 	)
-
 	if err != nil {
-		return fmt.Errorf("failed to clear queue: %w", err)
+		return fmt.Errorf("failed to reset queue counter: %w", err)
+	}
+
+	_, err = tx.ExecContext(
+		ctx,
+		`UPDATE QueueTickets
+		 SET Status = 'CLEARED'
+		 WHERE Status <> 'CLEARED'`,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to update ticket status to cleared: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit clear transaction: %w", err)
 	}
 
 	return nil
