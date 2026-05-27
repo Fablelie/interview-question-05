@@ -1,9 +1,10 @@
 {
   "info": {
-    "_postman_id": "queue-ticket-system",
+    "_postman_id": "f5484b66-d212-407d-b6b5-58c1626f70e8",
     "name": "Queue Ticket System - API Testing",
     "description": "Complete API testing for Queue Ticket System",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3835912"
   },
   "item": [
     {
@@ -13,8 +14,12 @@
         "header": [],
         "url": {
           "raw": "{{base_url}}/health",
-          "host": ["{{base_url}}"],
-          "path": ["health"]
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health"
+          ]
         },
         "description": "Check if API is running"
       },
@@ -27,8 +32,14 @@
         "header": [],
         "url": {
           "raw": "{{base_url}}/api/queue/current",
-          "host": ["{{base_url}}"],
-          "path": ["api", "queue", "current"]
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "queue",
+            "current"
+          ]
         },
         "description": "Get current queue number and status"
       },
@@ -36,6 +47,42 @@
     },
     {
       "name": "Get Next Ticket #1",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// 1. ตั้งค่าเริ่มต้นระบุจำนวนรอบที่ต้องการยิงคำสั่ง (รอบแรกยังไม่มีค่า ให้เซตเป็น 50)\r",
+              "if (!pm.variables.has(\"loop_counter\")) {\r",
+              "    pm.variables.set(\"loop_counter\", 100);\r",
+              "}\r",
+              "\r",
+              "// 2. ดึงค่าตัวนับรอบปัจจุบันมาใช้งาน\r",
+              "let counter = pm.variables.get(\"loop_counter\");\r",
+              "\r",
+              "// 3. แสดงบันทึกข้อมูลใน Console เพื่อเอาไว้ตรวจสอบรอบการทำงาน\r",
+              "console.log(\"จำนวนรอบที่เหลือ: \" + counter + \" รอบ\");\r",
+              "\r",
+              "// 4. เงื่อนไขในการสั่งรันซ้ำ\r",
+              "if (counter > 1) {\r",
+              "    // ลบจำนวนรอบออกทีละ 1\r",
+              "    pm.variables.set(\"loop_counter\", counter - 1);\r",
+              "    \r",
+              "    // สั่งให้ Postman วิ่งกลับมาเรียกยิง Request ปัจจุบันนี้ใหม่อีกครั้ง\r",
+              "    postman.setNextRequest(pm.info.requestName);\r",
+              "} else {\r",
+              "    // เมื่อทำงานครบ 50 รอบแล้ว ให้ล้างตัวแปรทิ้งเพื่อเปิดทางให้การรันครั้งใหม่ในอนาคต\r",
+              "    pm.variables.unset(\"loop_counter\");\r",
+              "    postman.setNextRequest(null);\r",
+              "}\r",
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -44,10 +91,25 @@
             "value": "application/json"
           }
         ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
         "url": {
           "raw": "{{base_url}}/api/tickets/next",
-          "host": ["{{base_url}}"],
-          "path": ["api", "tickets", "next"]
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "tickets",
+            "next"
+          ]
         },
         "description": "Issue next ticket (Request #1)"
       },
@@ -55,6 +117,19 @@
     },
     {
       "name": "Get Next Ticket #2",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
       "request": {
         "method": "POST",
         "header": [
@@ -63,31 +138,27 @@
             "value": "application/json"
           }
         ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
         "url": {
           "raw": "{{base_url}}/api/tickets/next",
-          "host": ["{{base_url}}"],
-          "path": ["api", "tickets", "next"]
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "tickets",
+            "next"
+          ]
         },
         "description": "Issue next ticket (Request #2)"
-      },
-      "response": []
-    },
-    {
-      "name": "Get Next Ticket #3",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "url": {
-          "raw": "{{base_url}}/api/tickets/next",
-          "host": ["{{base_url}}"],
-          "path": ["api", "tickets", "next"]
-        },
-        "description": "Issue next ticket (Request #3)"
       },
       "response": []
     },
@@ -98,8 +169,14 @@
         "header": [],
         "url": {
           "raw": "{{base_url}}/api/tickets/latest",
-          "host": ["{{base_url}}"],
-          "path": ["api", "tickets", "latest"]
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "tickets",
+            "latest"
+          ]
         },
         "description": "Get the most recently issued ticket"
       },
@@ -117,8 +194,14 @@
         ],
         "url": {
           "raw": "{{base_url}}/api/queue/clear",
-          "host": ["{{base_url}}"],
-          "path": ["api", "queue", "clear"]
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "queue",
+            "clear"
+          ]
         },
         "description": "Reset queue counter to A0"
       },
@@ -128,8 +211,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:3000",
-      "type": "string"
+      "value": "http://localhost:3000"
     }
   ]
 }
