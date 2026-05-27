@@ -1,0 +1,135 @@
+{
+  "info": {
+    "_postman_id": "queue-ticket-system",
+    "name": "Queue Ticket System - API Testing",
+    "description": "Complete API testing for Queue Ticket System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Check if API is running"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Current Queue",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/queue/current",
+          "host": ["{{base_url}}"],
+          "path": ["api", "queue", "current"]
+        },
+        "description": "Get current queue number and status"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Next Ticket #1",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/tickets/next",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tickets", "next"]
+        },
+        "description": "Issue next ticket (Request #1)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Next Ticket #2",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/tickets/next",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tickets", "next"]
+        },
+        "description": "Issue next ticket (Request #2)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Next Ticket #3",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/tickets/next",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tickets", "next"]
+        },
+        "description": "Issue next ticket (Request #3)"
+      },
+      "response": []
+    },
+    {
+      "name": "Get Latest Ticket",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tickets/latest",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tickets", "latest"]
+        },
+        "description": "Get the most recently issued ticket"
+      },
+      "response": []
+    },
+    {
+      "name": "Clear Queue",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/queue/clear",
+          "host": ["{{base_url}}"],
+          "path": ["api", "queue", "clear"]
+        },
+        "description": "Reset queue counter to A0"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}

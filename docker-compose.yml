@@ -1,0 +1,62 @@
+services:
+  # SQL Server Database
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: queue-ticket-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "mypassword!1234"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+    networks:
+      - queue-ticket-network
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "mypassword!1234", "-Q", "SELECT 1", "-C"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Golang Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: queue-ticket-backend
+    environment:
+      DB_SERVER: mssql
+      DB_PORT: 1433
+      DB_USER: sa
+      DB_PASSWORD: "mypassword!1234"
+      DB_NAME: master
+      SERVER_PORT: 3000
+      SERVER_HOST: 0.0.0.0
+    ports:
+      - "3000:3000"
+    depends_on:
+      mssql:
+        condition: service_healthy
+    networks:
+      - queue-ticket-network
+    restart: unless-stopped
+
+  # Adminer: Web-based Database Client
+  db-web-client:
+    image: adminer:latest
+    container_name: queue-ticket-adminer
+    ports:
+      - "8080:8080"
+    networks:
+      - queue-ticket-network
+    depends_on:
+      mssql:
+        condition: service_healthy
+    restart: unless-stopped
+
+networks:
+  queue-ticket-network:
+    driver: bridge
+
+volumes:
+  sqlserverdata:
