@@ -81,7 +81,7 @@ func (uc *QueueUseCase) ClearQueue(ctx context.Context) (*dto.ClearQueueResponse
 
 	return &dto.ClearQueueResponse{
 		Message:       "Queue cleared successfully",
-		CurrentNumber: "A0",
+		CurrentNumber: "00",
 		ClearedAt:     time.Now(),
 	}, nil
 }

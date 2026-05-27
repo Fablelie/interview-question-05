@@ -86,10 +86,23 @@ func (r *QueueRepository) GetNextTicketNumber(ctx context.Context) (string, erro
 
 // SaveTicket saves a new ticket to database
 func (r *QueueRepository) SaveTicket(ctx context.Context, ticket *domain.QueueTicket) error {
+	query := `
+		MERGE INTO QueueTickets AS Target
+		USING (SELECT @Number AS TicketNumber) AS Source
+		ON (Target.TicketNumber = Source.TicketNumber)
+		WHEN MATCHED THEN
+			UPDATE SET 
+				CreatedAt = @CreatedAt,
+				IssuedAt = @IssuedAt,
+				Status = @Status
+		WHEN NOT MATCHED THEN
+			INSERT (TicketNumber, CreatedAt, IssuedAt, Status)
+			VALUES (@Number, @CreatedAt, @IssuedAt, @Status);
+	`
+
 	_, err := r.db.ExecContext(
 		ctx,
-		`INSERT INTO QueueTickets (TicketNumber, CreatedAt, IssuedAt, Status)
-		 VALUES (@Number, @CreatedAt, @IssuedAt, @Status)`,
+		query,
 		sql.Named("Number", ticket.Number),
 		sql.Named("CreatedAt", ticket.CreatedAt),
 		sql.Named("IssuedAt", ticket.IssuedAt),
@@ -127,7 +140,7 @@ func (r *QueueRepository) ClearQueue(ctx context.Context) error {
 	_, err := r.db.ExecContext(
 		ctx,
 		`UPDATE QueueCounter 
-		 SET CurrentNumber = 'A0', 
+		 SET CurrentNumber = '00', 
 		     VersionLock = VersionLock + 1,
 		     LastUpdatedAt = GETUTCDATE()
 		 WHERE ID = 1`,

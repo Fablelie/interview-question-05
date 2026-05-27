@@ -41,7 +41,7 @@ func RunMigration(db *sql.DB) error {
 			
 			-- Insert default row
 			INSERT INTO QueueCounter (ID, CurrentNumber, LastUpdatedAt, VersionLock)
-			VALUES (1, 'A0', GETUTCDATE(), 0)
+			VALUES (1, '00', GETUTCDATE(), 0)
 		END
 	`); err != nil {
 		return fmt.Errorf("failed to create QueueCounter table: %w", err)

@@ -15,6 +15,10 @@ func (g *TicketNumberGenerator) GetNextNumber(currentNumber string) (string, err
 		return "", fmt.Errorf("invalid ticket number format: %s", currentNumber)
 	}
 
+	if currentNumber == "00" {
+		return "A0", nil
+	}
+
 	letter := rune(currentNumber[0])
 	digit := rune(currentNumber[1])
 
