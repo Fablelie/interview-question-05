@@ -1,31 +1,39 @@
-# 🏗️ ช่วงที่ 1: ขั้นตอนการประกอบร่าง (ใช้เวอร์ชันระบุชัดเจนป้องกันระบบพังในอนาคต)
+# 🏗️ Stage 1: Build the Go binary using the official Golang image
 FROM golang:latest AS builder
 
+# Set the current working directory inside the container
 WORKDIR /app
 
-# คัดลอกเฉพาะไฟล์จัดการ Dependency
+# Copy the dependency management files first to leverage Docker cache
 COPY go.mod go.sum ./
 
-# ดาวน์โหลดโปรแกรมเสริมมารอไว้
+# Download all required dependencies specified in the go.mod file
 RUN go mod download
 
-# คัดลอกซอร์สโค้ดทั้งหมดเข้ากล่องประกอบร่าง
+# Copy the entire source code into the container working directory
 COPY . .
 
-# [แก้ไขหลัก]: เปลี่ยน CGO_ENABLED=0 เพื่อตัดปัญหาเรื่องไลบรารีภาษา C ของ Linux ออกไปทั้งหมด 
-# และทำการสร้างไฟล์โปรแกรมแบบ Standalone ที่รันบนตัว Alpine จิ๋วได้ทันที
+# Compile the application into a standalone static binary for Linux
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o queue-ticket-api ./cmd/main.go
 
 
-# 📦 ช่วงที่ 2: ขั้นตอนการแพ็คของส่งออก (ใช้ตู้คอนเทนเนอร์ขนาดจิ๋วที่ปลอดภัย)
+# 📦 Stage 2: Create a minimal production image using Alpine Linux
 FROM alpine:3.19
 
+# Set the active working directory for the runtime container
 WORKDIR /root/
+
+# Install the required CA certificates to allow secure HTTPS networking connections
 RUN apk add --no-cache ca-certificates
+
+# Copy only the compiled executable binary from the builder stage
 COPY --from=builder /app/queue-ticket-api .
+
+# Copy the environment configuration blueprint file to initialize runtime variables
 COPY .env.example .env
 
+# Inform Docker that the container listens on port 3000 at runtime
 EXPOSE 3000
 
-# สั่งเปิดใช้งานระบบคิว
+# Specify the command to execute the backend server binary when the container starts
 CMD ["./queue-ticket-api"]
