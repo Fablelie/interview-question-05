@@ -1,0 +1,60 @@
+<div class="app-container">
+  <div class="window-wrapper">
+    
+    <!-- 📄 Page IT 05-1: Main Queue Request Dashboard -->
+    <div *ngIf="currentPage === 'IT-05-1'" class="page-card animate-fade">
+      <div class="header-tag">IT 05-1</div>
+      <h2>ระบบรับบัตรคิวอัตโนมัติ</h2>
+      <p class="subtitle">กรุณากดปุ่มเพื่อเลือกทำรายการที่ต้องการ</p>
+      
+      <div class="action-grid">
+        <button class="btn btn-generate" (click)="generateQueue()">
+          <span class="btn-icon">🎟️</span> รับบัตรคิว
+        </button>
+        <button class="btn btn-nav-clear" (click)="goToClearPage()">
+          <span class="btn-icon">⚙️</span> ล้างคิว
+        </button>
+      </div>
+    </div>
+
+    <!-- 📄 Page IT 05-2: Ticket Display Layout -->
+    <div *ngIf="currentPage === 'IT-05-2'" class="page-card animate-fade">
+      <div class="header-tag bg-success">IT 05-2</div>
+      <h2>หมายเลขบัตรคิวของคุณ</h2>
+      
+      <div class="ticket-display">
+        <div class="ticket-code">{{ queueCode }}</div>
+      </div>
+      
+      <div class="time-stamp-box" *ngIf="timestamp">
+        <p class="time-label">วัน/เดือน/ปี และเวลาที่กดบัตร</p>
+        <p class="time-value">{{ timestamp | date:'dd/MM/yyyy HH:mm:ss' }} น.</p>
+      </div>
+
+      <button class="btn btn-back" (click)="goBackToMain()">
+        ↩️ กลับไปหน้ารับบัตรคิว
+      </button>
+    </div>
+
+    <!-- 📄 Page IT 05-3: Queue Reset Management Pane -->
+    <div *ngIf="currentPage === 'IT-05-3'" class="page-card animate-fade">
+      <div class="header-tag bg-danger">IT 05-3</div>
+      <h2>หน้าจัดการล้างคิวระบบ</h2>
+      <p class="subtitle">ยืนยันสถานะหมายเลขคิวในระบบ</p>
+      
+      <div class="ticket-display danger-style">
+        <div class="ticket-code">{{ queueCode }}</div>
+      </div>
+      
+      <div class="action-grid vertical">
+        <button class="btn btn-clear-execute" (click)="executeClearQueue()" [disabled]="queueCode === '00'">
+          💥 เริ่มต้นทำการล้างคิว
+        </button>
+        <button class="btn btn-back" (click)="goBackToMain()">
+          ↩️ กลับไปหน้ารับบัตรคิว
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

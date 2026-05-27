@@ -54,6 +54,19 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: queue-ticket-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - queue-ticket-network
+    restart: unless-stopped
+
 networks:
   queue-ticket-network:
     driver: bridge
